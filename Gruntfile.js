@@ -24,12 +24,13 @@ module.exports = function(grunt) {
 
     // Configuration to be run (and then tested).
     mochaSelenium: {
-      all: ['test/functional/sanity.js'],
+      options: {
+        timeout: 30e3
+      },
       promises: {
         src: ['test/functional/promises.js'],
         options: {
-          usePromises: true,
-          reporter: 'nyan'
+          usePromises: true
         }
       },
       chrome: {
@@ -37,7 +38,8 @@ module.exports = function(grunt) {
         options: {
           useChrome: true
         }
-      }
+      },
+      sanity: ['test/functional/sanity.js'],
     }
 
   });

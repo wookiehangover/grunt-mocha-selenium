@@ -1,6 +1,9 @@
 var Mocha = require('mocha');
+var Module = require('module');
+var path = require('path');
 
-module.exports = function(options, browser, paths){
+module.exports = function(options, browser, grunt, fileGroup){
+
   // Set up the mocha instance with options and files.
   // This is copied from Mocha.prototype.run
   // We need to do this because we need the runner, and the runner
@@ -11,7 +14,14 @@ module.exports = function(options, browser, paths){
     this.ctx.browser = browser;
   });
 
-  paths.forEach(mocha.addFile.bind(mocha));
+  grunt.file.expand({filter: 'isFile'}, fileGroup.src).forEach(function (f) {
+    var filePath = path.resolve(f);
+    if (Module._cache[filePath]) {
+      delete Module._cache[filePath];
+    }
+    mocha.addFile(filePath);
+  });
+
   if (mocha.files.length){
     mocha.loadFiles();
   }

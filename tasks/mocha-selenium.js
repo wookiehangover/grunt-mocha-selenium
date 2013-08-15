@@ -2,31 +2,20 @@
 
 "use strict";
 
-var createDomain = require('domain').create;
-var path = require('path');
-var mocha = require('./lib/mocha-runner');
-var mochaReporterBase = require('mocha/lib/reporters/base');
-var seleniumLauncher = require('selenium-launcher');
-var wd = require('wd');
-
 module.exports = function(grunt) {
+  var createDomain = require('domain').create;
+  var path = require('path');
+  var mocha = require('./lib/mocha-runner');
+  var mochaReporterBase = require('mocha/lib/reporters/base');
+  var seleniumLauncher = require('selenium-launcher');
+  var wd = require('wd');
+
   grunt.registerMultiTask('mochaSelenium', 'Run functional tests with mocha', function() {
-    var paths = this.filesSrc.map(function (file) {
-        return path.resolve(file);
-    });
+    var done = this.async();
     // Retrieve options from the grunt task.
-    var options = grunt.util._.defaults(this.options(), {
+    var options = this.options({
       useChrome: false
     });
-    var gruntDone = this.async();
-
-    // Guard against a common failure mode
-    if (paths.length === 0) {
-      grunt.warn(
-        'No files found in mocha-selenium:' + this.file.dest + ' task.'
-      );
-      return false;
-    }
 
     // We want color in our output, but when grunt-contrib-watch is used,
     //  mocha will detect that it's being run to a pipe rather than tty.
@@ -51,27 +40,34 @@ module.exports = function(grunt) {
     var restore = function() {
       mochaReporterBase.useColors = priorUseColors;
       unmanageExceptions();
+      done();
     };
+
+    grunt.util.async.forEachSeries(this.files, function(fileGroup, next){
+      runTests(fileGroup, options, next);
+    }, restore);
+  });
+
+
+  function runTests(fileGroup, options, next){
 
     // When we're done with mocha, dispose the domain
     var mochaDone = function(errCount) {
       var withoutErrors = (errCount === 0);
-      restore(); // restore prior node state
       // Indicate whether we failed to the grunt task runner
-      gruntDone(withoutErrors);
+      next(withoutErrors);
     };
 
-    seleniumLauncher({ chrome: options.useChrome }, function(err, proc) {
+    seleniumLauncher({ chrome: options.useChrome }, function(err, selenium) {
       grunt.log.writeln('Selenium Running');
       if(err){
-        proc.exit();
-        restore();
+        selenium.exit();
         grunt.fail.fatal(err);
         return;
       }
 
       var remote = options.usePromises ? 'promiseRemote' : 'remote';
-      var browser = wd[remote](proc.host, proc.port);
+      var browser = wd[remote](selenium.host, selenium.port);
       var opts = {
         browserName: options.useChrome ? 'chrome' : 'firefox'
       };
@@ -86,32 +82,30 @@ module.exports = function(grunt) {
 
       browser.init(opts, function(err){
         if(err){
-          restore();
           grunt.fail.fatal(err);
           return;
         }
 
-        var runner = mocha(options, browser, paths);
+        var runner = mocha(options, browser, grunt, fileGroup);
         // Create the domain, and pass any errors to the mocha runner
         var domain = createDomain();
         domain.on('error', runner.uncaught.bind(runner));
 
-        // Selenium Download and Launch
-        domain.run(function() {
-          runner.run(function(err){
-            browser.quit(function(){
-              proc.kill();
-              mochaDone(err);
+        // Give selenium some breathing room
+        setTimeout(function(){
+          // Selenium Download and Launch
+          domain.run(function() {
+            runner.run(function(err){
+              browser.quit(function(){
+                selenium.kill();
+                mochaDone(err);
+              });
             });
           });
-        });
-      });
-
-      proc.on('exit', function(){
-        browser.quit();
+        }, 300);
       });
 
     });
 
-  });
+  }
 };
