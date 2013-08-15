@@ -1,6 +1,6 @@
 {
   "name": "grunt-mocha-selenium",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Run functional Mocha tests with webdriver against a local selenium instance.",
   "homepage": "https://github.com/wookiehangover/grunt-mocha-selenium",
   "bugs": "https://github.com/wookiehangover/grunt-mocha-selenium/issues",
@@ -29,7 +29,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "selenium-launcher": "~1.1.6",
+    "selenium-launcher": "git://github.com/wookiehangover/nodejs-selenium-launcher.git",
     "wd": "0.0.34",
     "mocha": "~1.12.0"
   }

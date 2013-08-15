@@ -15,7 +15,9 @@ module.exports = function(grunt) {
         return path.resolve(file);
     });
     // Retrieve options from the grunt task.
-    var options = this.options();
+    var options = grunt.util._.defaults(this.options(), {
+      useChrome: false
+    });
     var gruntDone = this.async();
 
     // Guard against a common failure mode
@@ -59,7 +61,7 @@ module.exports = function(grunt) {
       gruntDone(withoutErrors);
     };
 
-    seleniumLauncher(function(err, proc) {
+    seleniumLauncher({ chrome: options.useChrome }, function(err, proc) {
       grunt.log.writeln('Selenium Running');
       if(err){
         proc.exit();
@@ -68,7 +70,11 @@ module.exports = function(grunt) {
         return;
       }
 
-      var browser = wd[options.usePromises ? 'promiseRemote' : 'remote'](proc.host, proc.port);
+      var remote = options.usePromises ? 'promiseRemote' : 'remote';
+      var browser = wd[remote](proc.host, proc.port);
+      var opts = {
+        browserName: options.useChrome ? 'chrome' : 'firefox'
+      };
 
       browser.on('status', function(info){
         grunt.log.writeln('\x1b[36m%s\x1b[0m', info);
@@ -78,7 +84,6 @@ module.exports = function(grunt) {
         grunt.log.debug(' > \x1b[33m%s\x1b[0m: %s', meth, path, data || '');
       });
 
-      var opts = { browserName: 'firefox' };
       browser.init(opts, function(err){
         if(err){
           restore();

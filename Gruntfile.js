@@ -31,6 +31,12 @@ module.exports = function(grunt) {
           usePromises: true,
           reporter: 'nyan'
         }
+      },
+      chrome: {
+        src: ['test/functional/sanity.js'],
+        options: {
+          useChrome: true
+        }
       }
     }
 
