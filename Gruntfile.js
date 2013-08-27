@@ -36,10 +36,16 @@ module.exports = function(grunt) {
       chrome: {
         src: ['test/functional/sanity.js'],
         options: {
-          useChrome: true
+          browserName: 'chrome'
         }
       },
-      sanity: ['test/functional/sanity.js'],
+      phantomjs: {
+        src: ['test/functional/sanity.js'],
+        options: {
+          browserName: 'phantomjs'
+        }
+      },
+      sanity: ['test/functional/sanity.js']
     }
 
   });

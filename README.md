@@ -37,12 +37,22 @@ grunt.initConfig({
       // Toggles wd's promises API, default:false
       usePromises: false
     },
-    firefox: { src: ['test/*.js'] },
+    firefox: {
+      src: ['test/*.js']
+      // firefox is the default browser, so no browserName option required
+    },
     chrome: {
       src: ['test/*.js'],
       options: {
         // Chrome browser must be installed from Chromedriver support
-        useChrome: true
+        browserName: 'chrome'
+      }
+    },
+    phantomjs: {
+      src: ['test/*.js'],
+      options: {
+        // phantomjs must be in the $PATH when invoked
+        browserName: 'phantomjs'
       }
     }
   }

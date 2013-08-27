@@ -14,7 +14,8 @@ module.exports = function(grunt) {
     var done = this.async();
     // Retrieve options from the grunt task.
     var options = this.options({
-      useChrome: false
+      browserName: 'firefox',
+      usePromises: false
     });
 
     // We want color in our output, but when grunt-contrib-watch is used,
@@ -58,7 +59,7 @@ module.exports = function(grunt) {
       next(withoutErrors);
     };
 
-    seleniumLauncher({ chrome: options.useChrome }, function(err, selenium) {
+    seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
       grunt.log.writeln('Selenium Running');
       if(err){
         selenium.exit();
@@ -68,8 +69,9 @@ module.exports = function(grunt) {
 
       var remote = options.usePromises ? 'promiseRemote' : 'remote';
       var browser = wd[remote](selenium.host, selenium.port);
+
       var opts = {
-        browserName: options.useChrome ? 'chrome' : 'firefox'
+        browserName: options.browserName
       };
 
       browser.on('status', function(info){
