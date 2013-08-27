@@ -8,6 +8,7 @@ module.exports = function(grunt) {
   var mochaReporterBase = require('mocha/lib/reporters/base');
   var seleniumLauncher = require('selenium-launcher');
   var wd = require('wd');
+  var ensurePhantomInPath = require('./lib/ensurePhantomInPath');
 
   grunt.registerMultiTask('mochaSelenium', 'Run functional tests with mocha', function() {
     var done = this.async();
@@ -58,6 +59,10 @@ module.exports = function(grunt) {
       next(withoutErrors);
     };
 
+    if (options.browserName === 'phantomjs') {
+      grunt.log.ok('Ensuring phantomjs is in $PATH');
+      ensurePhantomInPath(grunt);
+    }
     seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
       grunt.log.writeln('Selenium Running');
       if(err){
