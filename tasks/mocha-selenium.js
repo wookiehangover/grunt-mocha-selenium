@@ -4,17 +4,20 @@
 
 module.exports = function(grunt) {
   var createDomain = require('domain').create;
-  var path = require('path');
   var mocha = require('./lib/mocha-runner');
   var mochaReporterBase = require('mocha/lib/reporters/base');
   var seleniumLauncher = require('selenium-launcher');
   var wd = require('wd');
+  var phantomjs = require('phantomjs');
+  var path = require('path');
 
   grunt.registerMultiTask('mochaSelenium', 'Run functional tests with mocha', function() {
     var done = this.async();
     // Retrieve options from the grunt task.
     var options = this.options({
-      useChrome: false
+      browserName: 'firefox',
+      usePromises: false,
+      useSystemPhantom: false
     });
 
     // We want color in our output, but when grunt-contrib-watch is used,
@@ -58,7 +61,12 @@ module.exports = function(grunt) {
       next(withoutErrors);
     };
 
-    seleniumLauncher({ chrome: options.useChrome }, function(err, selenium) {
+    if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
+      // add npm-supplied phantomjs bin dir to PATH, so selenium can launch it
+      process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
+    }
+
+    seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
       grunt.log.writeln('Selenium Running');
       if(err){
         selenium.exit();
@@ -68,8 +76,9 @@ module.exports = function(grunt) {
 
       var remote = options.usePromises ? 'promiseRemote' : 'remote';
       var browser = wd[remote](selenium.host, selenium.port);
+
       var opts = {
-        browserName: options.useChrome ? 'chrome' : 'firefox'
+        browserName: options.browserName
       };
 
       browser.on('status', function(info){
