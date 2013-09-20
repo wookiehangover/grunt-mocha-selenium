@@ -22,10 +22,11 @@ Gruntfile with this line of JavaScript:
 grunt.loadNpmTasks('grunt-mocha-selenium');
 ```
 
-## The "mocha_selenium" task
+## The "mochaSelenium" task
 
-### Overview In your project's Gruntfile, add a section named
-`mochaSelenium` to the data object passed into `grunt.initConfig()`.
+### Overview
+In your project's Gruntfile, add a section named `mochaSelenium` to the
+data object passed into `grunt.initConfig()`.
 
 ```js
 grunt.initConfig({
@@ -66,7 +67,9 @@ instance.
 
 The following options can be supplied to the task:
 
-#### options.usePromises Type: `Boolean` Default value: `false`
+#### options.usePromises
+
+Type: `Boolean` Default value: `false`
 
 If enabled, this will use the [promise-enabled wd browser
 API](https://github.com/admc/wd#promises-api) instead of the normal
@@ -100,6 +103,7 @@ and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
 
+* v0.3.0 - add phantomjs support
 * v0.2.0 - add chromedriver support
 * v0.0.1 - initial release
 
