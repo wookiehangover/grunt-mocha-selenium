@@ -1,8 +1,12 @@
 # grunt-mocha-selenium
 
-> Run functional Mocha tests with webdriver against a local selenium instance.
+> Run functional [Mocha](https://github.com/visionmedia/mocha) tests
+> with [wd](https://github.com/admc/wd) with [Selenium](http://docs.seleniumhq.org/), Phantomjs and
+> [Appium](http://appium.io/).
 
-## Getting Started This plugin requires Grunt.
+## Getting Started
+
+This plugin requires Grunt.
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to
 check out the [Getting Started](http://gruntjs.com/getting-started)
@@ -23,6 +27,20 @@ grunt.loadNpmTasks('grunt-mocha-selenium');
 ```
 
 ## The "mochaSelenium" task
+
+Selenium tests are run by a standalone selenium driver that will be
+downloaded the first time the task is run. Chrome support is provided by
+the [Chrome
+Driver](https://code.google.com/p/selenium/wiki/ChromeDriver) plugin for
+Selenium and is provided on demand.
+
+The task fires up a selenium instance for the browser of your choice
+(Firefox, Chrome or Phantomjs) and initializes an instance of
+[wd](https://github.com/admc/wd), passing it to the mocha test runner's
+context.
+
+Take a look in the `test` directory for examples of what mocha tests
+with wd look like.
 
 ### Overview
 In your project's Gruntfile, add a section named `mochaSelenium` to the
@@ -75,6 +93,52 @@ If enabled, this will use the [promise-enabled wd browser
 API](https://github.com/admc/wd#promises-api) instead of the normal
 synchronous API.
 
+## The "mochaAppium" task
+
+The "mochaAppium" task will use the [Appium](http://appium.io/) test
+automation framework to provide a selenium bridge to native and hybrid
+applications.
+
+**Unlike the "mochaSelenium" tasks, Appium needs to be installed
+separately.** See their [getting started
+guide](http://appium.io/getting-started.html) for information on
+installing and configuring Appium on you system. You don't need to run
+an Appium server before running this task, you just need to have it
+installed.
+
+### Overview
+In your project's Gruntfile, add a section named `mochaAppium` to the
+data object passed into `grunt.initConfig()`.
+
+```js
+grunt.initConfig({
+  mochaAppium: {
+    options: {
+      // Mocha options
+      reporter: 'spec',
+      timeout: 30e3,
+      // Toggles wd's promises API, default:false
+      usePromises: false
+      // Path to appium executable, default:'appium'
+      appiumPath: 'appium'
+    },
+    iphone: {
+      src: ['test/*.js'],
+      options: {
+        // Appium Options
+        device: 'iPhone Simulator',
+        platform: 'MAC',
+        version: '6.1',
+        // A url of a zip file containg your .app package
+        // or 
+        // A local absolute path to your simulator-compiled .app directory
+        app: 'http://appium.s3.amazonaws.com/TestApp6.0.app.zip'
+      }
+    }
+  }
+});
+```
+
 ### Usage Examples
 
 See this project's `Gruntfile.js` for examples.
@@ -103,6 +167,7 @@ and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
 
+* v0.4.0 - add Appium support
 * v0.3.0 - add phantomjs support
 * v0.2.0 - add chromedriver support
 * v0.0.1 - initial release
