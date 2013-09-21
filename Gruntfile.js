@@ -46,21 +46,31 @@ module.exports = function(grunt) {
         }
       },
       sanity: ['test/functional/sanity.js']
+    },
+
+    mochaAppium: {
+      options: {
+        timeout: 30e3
+      },
+      iphone: {
+        src: ['test/functional/appium.js'],
+        options: {
+          device: 'iPhone Simulator',
+          platform: 'MAC',
+          version: '6.1',
+          app: 'http://appium.s3.amazonaws.com/TestApp6.0.app.zip',
+          browserName: "iOS",
+          newCommandTimeout: 60
+        }
+      }
     }
 
   });
 
-  // Actually load this plugin's task(s).
   grunt.loadTasks('tasks');
-
-  // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
-  grunt.registerTask('test', ['mochaSelenium']);
+  grunt.registerTask('test', ['mochaSelenium', 'mochaAppium']);
 
-  // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test']);
-
 };
