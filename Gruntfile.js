@@ -33,6 +33,12 @@ module.exports = function(grunt) {
           usePromises: true
         }
       },
+      chaining: {
+        src: ['test/functional/chaining.js'],
+        options: {
+          useChaining: true
+        }
+      },
       chrome: {
         src: ['test/functional/sanity.js'],
         options: {
