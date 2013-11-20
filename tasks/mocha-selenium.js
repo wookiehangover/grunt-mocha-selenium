@@ -10,6 +10,9 @@ module.exports = function(grunt) {
   var wd = require('wd');
   var phantomjs = require('phantomjs');
   var path = require('path');
+  var os = require("os");
+  var isWin = os.platform().search(/win/i) > -1;
+  var PATHDelimiter = isWin ? ";" : ":";
 
   grunt.registerMultiTask('mochaSelenium', 'Run functional tests with mocha', function() {
     var done = this.async();
@@ -63,7 +66,7 @@ module.exports = function(grunt) {
 
     if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
       // add npm-supplied phantomjs bin dir to PATH, so selenium can launch it
-      process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
+      process.env.PATH = path.dirname(phantomjs.path) + PATHDelimiter + process.env.PATH;
     }
 
     seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
