@@ -11,7 +11,7 @@ module.exports = function(grunt) {
   var phantomjs = require('phantomjs');
   var path = require('path');
   var os = require("os");
-  var isWin = os.platform().search(/win/i) > -1;
+  var isWin = os.platform().search(/win/i) === 0;
   var PATHDelimiter = isWin ? ";" : ":";
 
   grunt.registerMultiTask('mochaSelenium', 'Run functional tests with mocha', function() {
