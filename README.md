@@ -64,7 +64,11 @@ grunt.initConfig({
       src: ['test/*.js'],
       options: {
         // Chrome browser must be installed from Chromedriver support
-        browserName: 'chrome'
+        browserName: 'chrome',
+        chromeOptions: {
+          // Any valid chrome capability:
+          // https://sites.google.com/a/chromium.org/chromedriver/capabilities
+        }
       }
     },
     phantomjs: {
