@@ -10,6 +10,9 @@ module.exports = function(grunt) {
   var wd = require('wd');
   var phantomjs = require('phantomjs');
   var path = require('path');
+  var SauceTunnel = require('sauce-tunnel');
+  var _ = grunt.util._;
+  var os = require('os');
 
   grunt.registerMultiTask('mochaSelenium', 'Run functional tests with mocha', function() {
     var done = this.async();
@@ -17,7 +20,10 @@ module.exports = function(grunt) {
     var options = this.options({
       browserName: 'firefox',
       usePromises: false,
-      useSystemPhantom: false
+      useSystemPhantom: false,
+      useSauce: false,
+      sauceUsername: null,
+      saucePassword: null
     });
 
     // We want color in our output, but when grunt-contrib-watch is used,
@@ -66,7 +72,42 @@ module.exports = function(grunt) {
       process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
     }
 
-    seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
+    var ensureSeleniumServer = function(opts, cb) {
+        if (options.useSauce) {
+            grunt.log.writeln('Connecting to the tunnel of sauce..');
+
+            var tunnelIdentifier = os.hostname();
+            var tunnel = new SauceTunnel(options.sauceUsername, options.saucePassword, tunnelIdentifier, true, 60e3);
+            tunnel.start(function(isCreated) {
+
+                if (isCreated) {
+                    grunt.log.writeln('Connected to the tunnel!');
+                }
+
+                var creationError = isCreated ? null : new Error('Tunnel not created!');
+                cb(creationError, {
+                    exit: function() {
+                        tunnel.stop();
+                    },
+                    kill: function() {
+                        tunnel.stop();
+                    },
+                    host: "ondemand.saucelabs.com",
+                    port: 80,
+                    username: options.sauceUsername,
+                    password: options.saucePassword,
+                    extraOptions: {
+                        "tunnel-identifier": tunnelIdentifier
+                    }
+                });
+
+            });
+        } else {
+            seleniumLauncher(opts, cb);
+        }
+    };
+
+    ensureSeleniumServer({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
       grunt.log.writeln('Selenium Running');
       if(err){
         selenium.exit();
@@ -77,11 +118,13 @@ module.exports = function(grunt) {
       var remote = options.usePromises ? 'promiseRemote' : 'remote';
       remote = options.useChaining ? 'promiseChainRemote' : remote;
 
-      var browser = wd[remote](selenium.host, selenium.port);
+      var browser = wd[remote](selenium.host, selenium.port, selenium.username, selenium.password);
 
       var opts = {
         browserName: options.browserName
       };
+
+      opts = _.extend(opts, selenium.extraOptions);
 
       browser.on('status', function(info){
         grunt.log.writeln('\x1b[36m%s\x1b[0m', info);
