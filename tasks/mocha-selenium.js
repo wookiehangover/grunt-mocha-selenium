@@ -80,7 +80,8 @@ module.exports = function(grunt) {
       var browser = wd[remote](selenium.host, selenium.port);
 
       var opts = {
-        browserName: options.browserName
+        browserName: options.browserName,
+        chromeOptions: options.chromeOptions
       };
 
       browser.on('status', function(info){
