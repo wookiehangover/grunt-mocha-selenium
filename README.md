@@ -57,8 +57,12 @@ grunt.initConfig({
       usePromises: false
     },
     firefox: {
-      src: ['test/*.js']
+      src: ['test/*.js'],
       // firefox is the default browser, so no browserName option required
+      options: {
+        firefox_profile: // Optionally pass in a firefox profile
+      }
+    }
     },
     chrome: {
       src: ['test/*.js'],
