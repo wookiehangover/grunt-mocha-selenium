@@ -97,7 +97,15 @@ module.exports = function(grunt) {
           return;
         }
 
-        var runner = mocha(options, browser, grunt, fileGroup);
+        try {
+            var runner = mocha(options, browser, grunt, fileGroup);
+        } catch(err) {
+            browser.quit(function(){
+                selenium.kill();
+                grunt.fail.fatal(err);
+            });
+        }
+
         // Create the domain, and pass any errors to the mocha runner
         var domain = createDomain();
         domain.on('error', runner.uncaught.bind(runner));
