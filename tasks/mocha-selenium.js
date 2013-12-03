@@ -55,10 +55,10 @@ module.exports = function(grunt) {
   function runTests(fileGroup, options, next){
 
     // When we're done with mocha, dispose the domain
-    var mochaDone = function(errCount) {
-      var withoutErrors = (errCount === 0);
+    var mochaDone = function(failureCount) {
+      var withoutFailures = (failureCount === 0);
       // Indicate whether we failed to the grunt task runner
-      next(withoutErrors);
+      next(withoutFailures);
     };
 
     if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
@@ -106,10 +106,10 @@ module.exports = function(grunt) {
         setTimeout(function(){
           // Selenium Download and Launch
           domain.run(function() {
-            runner.run(function(err){
+            runner.run(function(failureCount){
               browser.quit(function(){
                 selenium.kill();
-                mochaDone(err);
+                mochaDone(failureCount);
               });
             });
           });
