@@ -173,6 +173,7 @@ and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
 
+* v0.7.0 - bumping selenium and chromedriver versions
 * v0.4.0 - add Appium support
 * v0.3.0 - add phantomjs support
 * v0.2.0 - add chromedriver support
