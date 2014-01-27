@@ -62,12 +62,12 @@ module.exports = function(grunt) {
         username: options.username,
         accesskey: options.accesskey
       };
-      
-      startRunner(options, selenium, fileGroup);
-      
+
+      startRunner(options, selenium, fileGroup, next);
+
     }
     else{
-      
+
       if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
         // add npm-supplied phantomjs bin dir to PATH, so selenium can launch it
         process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
@@ -80,12 +80,12 @@ module.exports = function(grunt) {
           grunt.fail.fatal(err);
           return;
         }
-        startRunner(options, selenium, fileGroup);
+        startRunner(options, selenium, fileGroup, next);
       });
     }
   }
   
-  function startRunner(options, selenium, fileGroup){
+  function startRunner(options, selenium, fileGroup, next){
 
     // When we're done with mocha, dispose the domain
     var mochaDone = function(errCount) {
