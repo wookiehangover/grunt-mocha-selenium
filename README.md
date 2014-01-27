@@ -93,6 +93,12 @@ If enabled, this will use the [promise-enabled wd browser
 API](https://github.com/admc/wd#promises-api) instead of the normal
 synchronous API.
 
+### options.host and options.port
+
+If these are specified then a server will not be started but these settings will be used to connect to an existing server.
+
+"options.username" and "options.accesskey" can be specified if you want to use Sauce Labs' on demand service.
+
 ## The "mochaAppium" task
 
 The "mochaAppium" task will use the [Appium](http://appium.io/) test

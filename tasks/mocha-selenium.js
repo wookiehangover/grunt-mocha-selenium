@@ -54,69 +54,88 @@ module.exports = function(grunt) {
 
   function runTests(fileGroup, options, next){
 
+    if(options.host && options.port){ //don't need to start selenium ourselves as we are connecting to a specific server
+      grunt.log.writeln('Using external selenium server: ' + options.host + ":" + options.port);
+      var selenium = {
+        host: options.host,
+        port: options.port,
+        username: options.username,
+        accesskey: options.accesskey
+      };
+      
+      startRunner(options, selenium, fileGroup);
+      
+    }
+    else{
+      
+      if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
+        // add npm-supplied phantomjs bin dir to PATH, so selenium can launch it
+        process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
+      }
+
+      seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
+        grunt.log.writeln('Selenium Running');
+        if(err){
+          selenium.exit();
+          grunt.fail.fatal(err);
+          return;
+        }
+        startRunner(options, selenium, fileGroup);
+      });
+    }
+  }
+  
+  function startRunner(options, selenium, fileGroup){
+
     // When we're done with mocha, dispose the domain
     var mochaDone = function(errCount) {
       var withoutErrors = (errCount === 0);
       // Indicate whether we failed to the grunt task runner
       next(withoutErrors);
     };
+    
+    var remote = options.usePromises ? 'promiseRemote' : 'remote';
+    remote = options.useChaining ? 'promiseChainRemote' : remote;
 
-    if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
-      // add npm-supplied phantomjs bin dir to PATH, so selenium can launch it
-      process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
-    }
+    var browser = wd[remote](selenium.host, selenium.port, selenium.username, selenium.accesskey);
 
-    seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
-      grunt.log.writeln('Selenium Running');
+    grunt.log.debug("Selenium options: " + JSON.stringify(options));
+
+    browser.on('status', function(info){
+      grunt.log.writeln('\x1b[36m%s\x1b[0m', info);
+    });
+
+    browser.on('command', function(meth, path, data){
+      grunt.log.debug(' > \x1b[33m%s\x1b[0m: %s', meth, path, data || '');
+    });
+
+    browser.init(options, function(err){
       if(err){
-        selenium.exit();
         grunt.fail.fatal(err);
         return;
       }
 
-      var remote = options.usePromises ? 'promiseRemote' : 'remote';
-      remote = options.useChaining ? 'promiseChainRemote' : remote;
+      var runner = mocha(options, browser, grunt, fileGroup);
+      // Create the domain, and pass any errors to the mocha runner
+      var domain = createDomain();
+      domain.on('error', runner.uncaught.bind(runner));
 
-      var browser = wd[remote](selenium.host, selenium.port);
-
-      var opts = {
-        browserName: options.browserName
-      };
-
-      browser.on('status', function(info){
-        grunt.log.writeln('\x1b[36m%s\x1b[0m', info);
-      });
-
-      browser.on('command', function(meth, path, data){
-        grunt.log.debug(' > \x1b[33m%s\x1b[0m: %s', meth, path, data || '');
-      });
-
-      browser.init(opts, function(err){
-        if(err){
-          grunt.fail.fatal(err);
-          return;
-        }
-
-        var runner = mocha(options, browser, grunt, fileGroup);
-        // Create the domain, and pass any errors to the mocha runner
-        var domain = createDomain();
-        domain.on('error', runner.uncaught.bind(runner));
-
-        // Give selenium some breathing room
-        setTimeout(function(){
-          // Selenium Download and Launch
-          domain.run(function() {
-            runner.run(function(err){
-              browser.quit(function(){
+      // Give selenium some breathing room
+      setTimeout(function(){
+        // Selenium Download and Launch
+        domain.run(function() {
+          runner.run(function(err){
+            browser.quit(function(){
+              if(selenium.kill){
                 selenium.kill();
-                mochaDone(err);
-              });
+              }
+              mochaDone(err);
             });
           });
-        }, 300);
-      });
-
+        });
+      }, 300);
     });
-
+  
   }
+  
 };
