@@ -136,7 +136,7 @@ grunt.initConfig({
         platform: 'MAC',
         version: '6.1',
         // A url of a zip file containg your .app package
-        // or 
+        // or
         // A local absolute path to your simulator-compiled .app directory
         app: 'http://appium.s3.amazonaws.com/TestApp6.0.app.zip'
       }
@@ -149,7 +149,7 @@ grunt.initConfig({
 
 See this project's `Gruntfile.js` for examples.
 
-In this example, we'll run functinoal mocha tests for all files in the
+In this example, we'll run functional mocha tests for all files in the
 `test` directory using the wd promises API and the nyan-cat reporter.
 
 ```js
