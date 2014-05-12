@@ -124,7 +124,7 @@ grunt.initConfig({
       reporter: 'spec',
       timeout: 30e3,
       // Toggles wd's promises API, default:false
-      usePromises: false
+      usePromises: false,
       // Path to appium executable, default:'appium'
       appiumPath: 'appium'
     },
