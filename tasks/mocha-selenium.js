@@ -84,7 +84,7 @@ module.exports = function(grunt) {
       });
     }
   }
-  
+
   function startRunner(options, selenium, fileGroup, next){
 
     // When we're done with mocha, dispose the domain
@@ -93,7 +93,7 @@ module.exports = function(grunt) {
       // Indicate whether we failed to the grunt task runner
       next(withoutErrors);
     };
-    
+
     var remote = options.usePromises ? 'promiseRemote' : 'remote';
     remote = options.useChaining ? 'promiseChainRemote' : remote;
 
@@ -115,7 +115,7 @@ module.exports = function(grunt) {
         return;
       }
 
-      var runner = mocha(options, browser, grunt, fileGroup);
+      var runner = mocha(options, browser, grunt, fileGroup, wd[remote]);
       // Create the domain, and pass any errors to the mocha runner
       var domain = createDomain();
       domain.on('error', runner.uncaught.bind(runner));
@@ -135,7 +135,7 @@ module.exports = function(grunt) {
         });
       }, 300);
     });
-  
+
   }
-  
+
 };
