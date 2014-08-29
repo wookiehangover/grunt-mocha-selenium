@@ -95,8 +95,12 @@ module.exports = function(grunt) {
     // When we're done with mocha, dispose the domain
     var mochaDone = function(errCount) {
       var withoutErrors = (errCount === 0);
-      // Indicate whether we failed to the grunt task runner
-      next(withoutErrors);
+	  if (!withoutErrors) {
+		grunt.fail.fatal('Number of failed tests: ' + errCount);
+	  } else {
+		  // Indicate whether we failed to the grunt task runner
+		  next(withoutErrors);
+	  }
     };
 
     var remote = options.usePromises ? 'promiseRemote' : 'remote';
