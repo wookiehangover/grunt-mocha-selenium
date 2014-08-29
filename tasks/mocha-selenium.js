@@ -70,7 +70,12 @@ module.exports = function(grunt) {
 
       if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
         // add npm-supplied phantomjs bin dir to PATH, so selenium can launch it
-        process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
+		var isWin = /^win/.test(process.platform);
+		if (isWin) {
+			process.env.PATH = path.dirname(phantomjs.path) + ';' + process.env.PATH;
+		} else {
+			process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
+		}
       }
 
       seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
