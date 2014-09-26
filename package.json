@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "selenium-launcher": "git://github.com/wookiehangover/nodejs-selenium-launcher.git",
-    "wd": "^0.2.25",
+    "wd": "^0.3.8",
     "mocha": "^1.20.0",
     "phantomjs": "^1.9.7-8",
     "async": "^0.2.10",
