@@ -52,23 +52,6 @@ module.exports = function(grunt) {
         }
       },
       sanity: ['test/functional/sanity.js']
-    },
-
-    mochaAppium: {
-      options: {
-        timeout: 30e3
-      },
-      iphone: {
-        src: ['test/functional/appium.js'],
-        options: {
-          device: 'iPhone Simulator',
-          platform: 'MAC',
-          version: '6.1',
-          app: 'http://appium.s3.amazonaws.com/TestApp6.0.app.zip',
-          browserName: "iOS",
-          newCommandTimeout: 60
-        }
-      }
     }
 
   });
@@ -76,7 +59,7 @@ module.exports = function(grunt) {
   grunt.loadTasks('tasks');
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
-  grunt.registerTask('test', ['mochaSelenium', 'mochaAppium']);
+  grunt.registerTask('test', ['mochaSelenium']);
 
   grunt.registerTask('default', ['jshint', 'test']);
 };
