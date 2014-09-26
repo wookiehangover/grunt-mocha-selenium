@@ -70,7 +70,12 @@ module.exports = function(grunt) {
 
       if (options.browserName === 'phantomjs' && !options.useSystemPhantom) {
         // add npm-supplied phantomjs bin dir to PATH, so selenium can launch it
-        process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
+		var isWin = /^win/.test(process.platform);
+		if (isWin) {
+			process.env.PATH = path.dirname(phantomjs.path) + ';' + process.env.PATH;
+		} else {
+			process.env.PATH = path.dirname(phantomjs.path) + ':' + process.env.PATH;
+		}
       }
 
       seleniumLauncher({ chrome: options.browserName === 'chrome' }, function(err, selenium) {
@@ -90,8 +95,12 @@ module.exports = function(grunt) {
     // When we're done with mocha, dispose the domain
     var mochaDone = function(errCount) {
       var withoutErrors = (errCount === 0);
-      // Indicate whether we failed to the grunt task runner
-      next(withoutErrors);
+	  if (!withoutErrors) {
+		grunt.fail.fatal('Number of failed tests: ' + errCount);
+	  } else {
+		  // Indicate whether we failed to the grunt task runner
+		  next(withoutErrors);
+	  }
     };
 
     var remote = options.usePromises ? 'promiseRemote' : 'remote';
