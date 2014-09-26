@@ -130,6 +130,10 @@ module.exports = function(grunt) {
                 selenium.kill();
               }
               mochaDone(err);
+
+              if (err) {
+                 grunt.fail.warn('One or more tests failed.');
+              }
             });
           });
         });
