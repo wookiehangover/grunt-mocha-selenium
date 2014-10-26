@@ -93,11 +93,55 @@ If enabled, this will use the [promise-enabled wd browser
 API](https://github.com/admc/wd#promises-api) instead of the normal
 synchronous API.
 
-### options.host and options.port
+#### options.host and options.port
 
 If these are specified then a server will not be started but these settings will be used to connect to an existing server.
 
 "options.username" and "options.accesskey" can be specified if you want to use Sauce Labs' on demand service.
+
+#### options.wdCustomizer
+
+If you'd like to add [custom wd methods](https://github.com/admc/wd#adding-custom-methods),
+you can specify a `wdCustomizer` path to a module that patches the wd module
+before the wd remote is created.
+
+Example:
+
+```js
+grunt.initConfig({
+  mochaSelenium: {
+    options: {
+      reporter: 'spec',
+      timeout: 30e3,
+      useChaining: true
+    },
+    phantomjs: {
+      src: ['test/*.js'],
+      options: {
+        browserName: 'phantomjs',
+        wdCustomizer: 'test/wd_customizer'
+      }
+    }
+  }
+})
+```
+
+`test/wd_customizer.js`:
+
+```js
+function wdCustomizer(wd) {
+  wd.addPromiseChainMethod(
+    'waitForSomethingCustom',
+    function(pageId) {
+      return this.waitForElementByCssSelector('#somethingCustom');
+    }
+  );
+
+  return wd;
+}
+
+module.exports = wdCustomizer;
+```
 
 ## The "mochaAppium" task
 

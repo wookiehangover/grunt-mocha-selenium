@@ -51,7 +51,6 @@ module.exports = function(grunt) {
     }, restore);
   });
 
-
   function runTests(fileGroup, options, next){
 
     if(options.host && options.port){ //don't need to start selenium ourselves as we are connecting to a specific server
@@ -91,6 +90,12 @@ module.exports = function(grunt) {
   }
 
   function startRunner(options, selenium, fileGroup, next){
+
+    // If a WD customizer is specified, load it
+    if (options.wdCustomizer) {
+      var wdCustomizerPath = path.join(process.env.PWD, options.wdCustomizer);
+      wd = require(wdCustomizerPath)(wd);
+    }
 
     // When we're done with mocha, dispose the domain
     var mochaDone = function(errCount) {
