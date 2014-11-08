@@ -62,6 +62,9 @@ module.exports = function(grunt) {
         accesskey: options.accesskey
       };
 
+      delete options.host;
+      delete options.port;
+
       startRunner(options, selenium, fileGroup, next);
 
     }
