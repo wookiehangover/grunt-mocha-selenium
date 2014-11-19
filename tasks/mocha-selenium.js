@@ -129,6 +129,8 @@ module.exports = function(grunt) {
         return;
       }
 
+      browser.configureHttp(options.http || {});
+
       var runner = mocha(options, browser, grunt, fileGroup, wd);
       // Create the domain, and pass any errors to the mocha runner
       var domain = createDomain();
