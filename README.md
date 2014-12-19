@@ -143,52 +143,6 @@ function wdCustomizer(wd) {
 module.exports = wdCustomizer;
 ```
 
-## The "mochaAppium" task
-
-The "mochaAppium" task will use the [Appium](http://appium.io/) test
-automation framework to provide a selenium bridge to native and hybrid
-applications.
-
-**Unlike the "mochaSelenium" tasks, Appium needs to be installed
-separately.** See their [getting started
-guide](http://appium.io/getting-started.html) for information on
-installing and configuring Appium on you system. You don't need to run
-an Appium server before running this task, you just need to have it
-installed.
-
-### Overview
-In your project's Gruntfile, add a section named `mochaAppium` to the
-data object passed into `grunt.initConfig()`.
-
-```js
-grunt.initConfig({
-  mochaAppium: {
-    options: {
-      // Mocha options
-      reporter: 'spec',
-      timeout: 30e3,
-      // Toggles wd's promises API, default:false
-      usePromises: false,
-      // Path to appium executable, default:'appium'
-      appiumPath: 'appium'
-    },
-    iphone: {
-      src: ['test/*.js'],
-      options: {
-        // Appium Options
-        device: 'iPhone Simulator',
-        platform: 'MAC',
-        version: '6.1',
-        // A url of a zip file containg your .app package
-        // or
-        // A local absolute path to your simulator-compiled .app directory
-        app: 'http://appium.s3.amazonaws.com/TestApp6.0.app.zip'
-      }
-    }
-  }
-});
-```
-
 ### Usage Examples
 
 See this project's `Gruntfile.js` for examples.
